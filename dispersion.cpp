@@ -26,9 +26,15 @@ void disperse(double delays[], const properties prop)
 {
 
 	int nchans = prop.nchans;
+	double topchn = prop.topchn;
+	double band = prop.band;
+	double dm = prop.dm;
 
 	for (int chan = 0; chan < nchans; chan++)
 	{
+		// delay is with the respect to the top channel
+		delays[chan] = 4.15e06 * (pow(topchn + (double)chan * band,-2.0) - pow(topchn,-2.0)) * dm;
+		cout << delays[chan] << endl;
 	}
 }
 
@@ -69,6 +75,7 @@ int main(int argc, char* argv[])
 	}
 
 	// make sure bandwidth is negative
+	prop.band = -1.0 * fabs(prop.band);
 
 	cout << "Options: " << endl;
 	cout << "\tDM: " << prop.dm << endl;
@@ -80,8 +87,10 @@ int main(int argc, char* argv[])
 
 	double *delays = new double[nchans];
 
-
 	disperse(delays, prop);
+
+	cout << "Total dispersion delay: " << delays[1023] << " ms, "
+		<<  delays[1023] / (double)1000 << " s " << endl;
 
 	return 0;
 }
